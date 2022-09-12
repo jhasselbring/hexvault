@@ -1,7 +1,7 @@
 const fs = require('fs');
 const hexvector = require('hexvector');
 
-const lock = (input, output, offset) => {
+const lock = (input, output, offset, cb) => {
     let readStream = fs.createReadStream(input);
     let writeStream = fs.createWriteStream(output);
     let pendingString = '';
