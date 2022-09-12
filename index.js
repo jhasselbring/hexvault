@@ -46,7 +46,7 @@ const unlock = (input, output, offset, cb) => {
 
     readStream.on('end', () => {
         fileReadEnd = true;
-        cb)();
+        cb();
     });
 }
 
