@@ -22,9 +22,10 @@ const lock = (input, output, offset) => {
 
     readStream.on('end', () => {
         fileReadEnd = true;
+        cb();
     });
 }
-const unlock = (input, output, offset) => {
+const unlock = (input, output, offset, cb) => {
     let readStream = fs.createReadStream(input);
     let writeStream = fs.createWriteStream(output);
     let pendingString = '';
@@ -45,6 +46,7 @@ const unlock = (input, output, offset) => {
 
     readStream.on('end', () => {
         fileReadEnd = true;
+        cb)();
     });
 }
 
