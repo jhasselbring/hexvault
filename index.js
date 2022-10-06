@@ -20,8 +20,7 @@ const lock = (input, output, offset, cb) => {
         })
     });
 
-    readStream.on('end', () => {
-        fileReadEnd = true;
+    writeStream.on('close', () => {
         cb();
     });
 }
@@ -43,9 +42,7 @@ const unlock = (input, output, offset, cb) => {
             }
         })
     });
-
-    readStream.on('end', () => {
-        fileReadEnd = true;
+    writeStream.on('close', () => {
         cb();
     });
 }
