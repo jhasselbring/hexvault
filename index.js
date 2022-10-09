@@ -1,5 +1,10 @@
 const fs = require('fs');
 const hexvector = require('hexvector');
+
+const crypto = require('crypto');
+const algorithm = 'aes-256-ctr'
+
+
 const lock = (input, output, offset) => {
     return new Promise((resolve, reject) => {
         let readStream = fs.createReadStream(input);
@@ -88,6 +93,30 @@ const unlock = (input, output, offset) => {
         });
     })
 }
-
+const expandSecret = secret => {
+    let i = 0;
+    let newSecret = '';
+    while (i < 32) {
+        newSecret = newSecret + secret;
+        i++
+    }
+    return newSecret;
+}
+const encrypt = secret => {
+    // Make sure secret is long enough
+    secret = expandSecret(secret);
+    let key = crypto.createHash('sha256').update(String(secret)).digest('base64').slice(0, 32);
+    let iv = secret.slice(0, 16);
+    return crypto.createCipheriv(algorithm, key, iv);
+}
+const dencrypt = secret=> {
+    // Make sure secret is long enough
+    secret = expandSecret(secret);
+    let key = crypto.createHash('sha256').update(String(secret)).digest('base64').slice(0, 32);
+    let iv = secret.slice(0, 16);
+    return crypto.createDecipheriv(algorithm, key, iv);
+}
 exports.lock = lock;
 exports.unlock = unlock;
+exports.encrypt = encrypt;
+exports.dencrypt = dencrypt;
