@@ -69,7 +69,7 @@ const unlock = (input, output, offset) => {
                 }
                 if (ended) {
                     writeStream.end();
-                    
+
                 }
             })
         });
@@ -103,13 +103,14 @@ const expandSecret = secret => {
     return newSecret;
 }
 const encrypt = secret => {
+    console.log('Creating using ' + secret);
     // Make sure secret is long enough
     secret = expandSecret(secret);
     let key = crypto.createHash('sha256').update(String(secret)).digest('base64').slice(0, 32);
     let iv = secret.slice(0, 16);
     return crypto.createCipheriv(algorithm, key, iv);
 }
-const dencrypt = secret=> {
+const dencrypt = secret => {
     // Make sure secret is long enough
     secret = expandSecret(secret);
     let key = crypto.createHash('sha256').update(String(secret)).digest('base64').slice(0, 32);
@@ -120,3 +121,4 @@ exports.lock = lock;
 exports.unlock = unlock;
 exports.encrypt = encrypt;
 exports.dencrypt = dencrypt;
+exports.decrypt = dencrypt;
