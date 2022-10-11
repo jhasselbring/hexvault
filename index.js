@@ -93,6 +93,91 @@ const unlock = (input, output, offset) => {
         });
     })
 }
+const lock2 = (input, output, offset) => {
+    return new Promise((resolve, reject) => {
+        let readStream = fs.createReadStream(input);
+        let writeStream = fs.createWriteStream(output);
+        let ended = false;
+        readStream.on('data', chunk => {
+            let pendingArray = [];
+            for (const value of chunk.values()) {
+                pendingArray.push(value + offset);
+                if (typeof value != 'number') {
+                    console.log('Not a number');
+                }
+            }
+            let chunkBuffer = Buffer.from(pendingArray);
+            // console.log('chunkBuffer', chunkBuffer)
+            writeStream.write(chunkBuffer, error => {
+                if (error) {
+                    console.error('Oh no! ', error);
+                }
+                if (ended == true) {
+                    writeStream.end();
+                    resolve({ success: true });
+                }
+            })
+        });
+
+        // Read has ended but don't return yet because write might not be done
+        readStream.on('end', () => {
+            ended = true;
+        });
+        // Reject immediately on error
+        readStream.on('error', () => {
+            writeStream.end();
+            reject({ success: false });
+        })
+        // Reject immediately on error
+        writeStream.on('error', () => {
+            writeStream.end();
+            reject({ success: false });
+        });
+    })
+}
+const unlock2 = (input, output, offset) => {
+    return new Promise((resolve, reject) => {
+        let readStream = fs.createReadStream(input);
+        let writeStream = fs.createWriteStream(output);
+        let ended = false;
+        readStream.on('data', chunk => {
+            let pendingArray = [];
+            for (const value of chunk.values()) {
+                pendingArray.push(value - offset);
+                if (typeof value != 'number') {
+                    console.log('Not a number');
+                }
+            }
+            let chunkBuffer = Buffer.from(pendingArray);
+            writeStream.write(chunkBuffer, error => {
+                if (error) {
+                    console.error('Oh no! ', error);
+                }
+                if (ended == true) {
+                    writeStream.end();
+                    resolve({ success: true });
+                }
+            })
+        });
+
+        // Read has ended but don't return yet because write might not be done
+        readStream.on('end', () => {
+            ended = true;
+
+        });
+        // Reject immediately on error
+        readStream.on('error', () => {
+            writeStream.end();
+            reject({ success: false });
+        })
+
+        // Reject immediately on error
+        writeStream.on('error', () => {
+            writeStream.end();
+            reject({ success: false });
+        });
+    })
+}
 const expandSecret = secret => {
     let i = 0;
     let newSecret = '';
@@ -118,7 +203,9 @@ const dencrypt = secret => {
     return crypto.createDecipheriv(algorithm, key, iv);
 }
 exports.lock = lock;
+exports.lock2 = lock2;
 exports.unlock = unlock;
+exports.unlock2 = unlock2;
 exports.encrypt = encrypt;
 exports.dencrypt = dencrypt;
 exports.decrypt = dencrypt;
